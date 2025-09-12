@@ -1,0 +1,3 @@
+/config/*
+!/config/ffa_Logo.svg
+!/config/.gitkeep
