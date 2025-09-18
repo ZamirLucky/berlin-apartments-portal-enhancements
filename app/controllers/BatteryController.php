@@ -61,6 +61,33 @@ class BatteryController {
 
         return $smartlocks;
     }
+    
+    // Method to get device index with coordinates
+    public function getDeviceIndex(){
+        $allSmartlocks = $this->getSmartlockData();
+
+        // Filter for deviceIndex (devices with coordinates)
+        $devicesWithCoordinates = array_filter($allSmartlocks, function($device) {
+            $lat = $device['config']['latitude'] ?? null;
+            $lng = $device['config']['longitude'] ?? null;
+            return is_numeric($lat) && is_numeric($lng);
+        });
+
+        // Transform for deviceIndex
+        $deviceIndex = array_map(function($d) {
+            return [
+                'smartlockId' => $d['smartlockId'] ?? '',
+                'name' => $d['name'] ?? 'Unknown',
+                'latitude' => (float)($d['config']['latitude'] ?? 0),
+                'longitude' => (float)($d['config']['longitude'] ?? 0),
+                'status' => $d['state']['batteryCritical'] ?? 'not available',
+                'batteryCharge' => $d['state']['batteryCharge'] ?? 'not available',
+                'isOnline' => $d['serverState'] ?? ''
+                
+            ];
+        }, $devicesWithCoordinates);
+        return $deviceIndex;
+    }
 }
 
 // Example usage:

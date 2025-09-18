@@ -19,6 +19,7 @@ if (!$loginController->isLoggedIn()) {
 
 $batteryController = new BatteryController();
 $smartlocks = $batteryController->getSortedSmartlockData();
+$deviceIndex = $batteryController->getDeviceIndex();
 
 // Get search term from query parameters
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
@@ -102,6 +103,7 @@ $batteryTypeMapping = [
                                         <th>Battery Status</th>
                                         <th>Battery Charge (%)</th>
                                         <th>Battery Type</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="smartlockTableBody">
@@ -129,6 +131,15 @@ $batteryTypeMapping = [
                                                     echo 'Not available';
                                                 }
                                                 ?>
+                                            </td>
+                                            <td>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-primary getNearbyDevicesButton" 
+                                                        data-smartlock-id="<?= htmlspecialchars($smartlock['smartlockId'] ?? '') ?>"
+                                                        data-smartlock-name="<?= htmlspecialchars($smartlock['name'] ?? '') ?>"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#staticBackdrop">Nearby
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -167,6 +178,77 @@ $batteryTypeMapping = [
             </div>
         </div>
     </div>
+
+    <!-- Modal for nearby devices -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title fs-6 d-flex align-items-center flex-wrap gap-2 mb-0" id="staticBackdropLabel">
+                        Nearby Devices
+                        <span class="badge rounded-pill text-bg-secondary d-inline-block text-truncate px-2 py-1" id="originalDeviceNameBadge" style="max-width: 55%;"></span> 
+                    </h6>
+                    <button type="button" class="btn-close btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Radius selection -->
+                    <div class="row g-2 align-items-center">
+                        <div class="col-3 col-sm-2 fw-semibold text-secondary">Radius</div>
+                        <div class="col-9 col-sm-10">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input" type="radio" name="radius" id="r500" value="500">
+                                    <label class="form-check-label" for="r500">500 m</label>
+                                </div>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input" type="radio" name="radius" id="r1000" value="1000" checked>
+                                    <label class="form-check-label" for="r1000">1 km</label>
+                                </div>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input" type="radio" name="radius" id="r2000" value="2000">
+                                    <label class="form-check-label" for="r2000">2 km</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- / End Radius Selection -->
+
+                    <hr class="my-3">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Battery Status</th>
+                                    <th>Battery Charge</th>
+                                    <th>Status</th>
+                                    <th>Distance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="nearbyDevicesList">
+                                <!-- Nearby devices will be populated here by geolocation.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass PHP data to JavaScript -->
+    <script>
+            window.deviceIndex = <?= json_encode($deviceIndex) ?>;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- geolib LOCAL -->
+    <script src="../../public/js/index.js"></script>
+
     <script src="../../public/js/battery.js"></script>
+    <script src="../../public/js/geolocation.js"></script>
 </body>
 </html>
