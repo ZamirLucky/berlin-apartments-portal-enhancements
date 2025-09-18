@@ -56,7 +56,7 @@ if (is_array($smartlockArray)) {
                         <th class="text-center">Allowed Until</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableBody">
                     <?php if (empty($emailData)): ?>
                         <tr>
                             <td colspan="5" class="text-center text-muted">
@@ -78,5 +78,28 @@ if (is_array($smartlockArray)) {
             </table>
         </div>
     </div>
+    <!-- Pagination Controls -->
+    <div id="paginationControls" class="mt-3 d-flex justify-content-center align-items-center"></div>
 </body>
 </html>
+
+<script type="module">
+    import { Paginator } from '../../public/js/pagination.js';
+
+    document.addEventListener('DOMContentLoaded', function() { 
+        const tableBody = document.getElementById('tableBody');
+        const paginationControls = document.getElementById('paginationControls');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+        if(rows.length === 0 || 
+           (rows.length === 1 && rows[0].textContent.includes('No authorized Smart Locks found'))) {
+            paginationControls.innerHTML = '';
+            return;
+        }
+
+        new Paginator({
+            rows,
+            paginationControls
+        });
+    });
+</script>

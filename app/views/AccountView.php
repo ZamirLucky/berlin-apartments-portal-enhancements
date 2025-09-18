@@ -59,7 +59,7 @@ foreach ($smartLockDevices as $device) {
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tableBody">
                 <?php if (!empty($smartLockAuths)): ?>
                     <?php foreach ($smartLockAuths as $auth): ?>
                         <tr id="row-<?= htmlspecialchars($auth['authId'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -87,11 +87,14 @@ foreach ($smartLockDevices as $device) {
             </tbody>
         </table>
     </div>
+    <!-- Pagination Controls -->
+    <div id="paginationControls" class="mt-3 d-flex justify-content-center align-items-center"></div>
 </body>
 
 </html>
 
-<script>
+<script type="module">
+    import { Paginator } from '../../public/js/pagination.js';
     document.addEventListener("DOMContentLoaded", function() {
         const deleteButtons = document.querySelectorAll(".delete-btn");
 
@@ -136,6 +139,21 @@ foreach ($smartLockDevices as $device) {
                     })
                     .catch(error => console.error("Request error:", error));
             });
+        });
+
+        const tableBody = document.getElementById('tableBody');
+        const paginationControls = document.getElementById('paginationControls');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+        if(rows.length === 0 || 
+           (rows.length === 1 && rows[0].textContent.includes('No authorized Smart Locks found'))) {
+            paginationControls.innerHTML = '';
+            return;
+        }
+
+        new Paginator({
+            rows,
+            paginationControls
         });
     });
 </script>
