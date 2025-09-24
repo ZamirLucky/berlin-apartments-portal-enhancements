@@ -12,6 +12,8 @@ if (!isset($_SESSION['user_email'])) {
 header('Location: /app/views/SmartlockView.php');
 exit();
 
+
+
 ob_end_flush(); // End output buffering
 
  //...
